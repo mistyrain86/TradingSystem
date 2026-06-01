@@ -131,7 +131,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AutoTradingSystemTest.cpp" />
     <ClCompile Include="kiwer_api.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="nemo_api.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
