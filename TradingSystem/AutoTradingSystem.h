@@ -1,6 +1,8 @@
 #pragma once
 #include <chrono>
 #include <iostream>
+#include <set>
+#include <stdexcept>
 #include <thread>
 #include "StockBroker.h"
 
@@ -12,6 +14,10 @@ public:
         if (!name.empty()) {
             std::cout << "[selectStockBroker] " << name << "\n";
         }
+    }
+
+    void registerStockCode(const std::string& stockCode) {
+        m_registeredStockCodes.insert(stockCode);
     }
 
     void login(const std::string& id, const std::string& pass) {
@@ -27,6 +33,12 @@ public:
     }
 
     int getPrice(const std::string& stockCode) {
+        if (stockCode.empty()) {
+            throw std::invalid_argument("종목코드를 입력해주세요");
+        }
+        if (m_registeredStockCodes.find(stockCode) == m_registeredStockCodes.end()) {
+            throw std::invalid_argument("등록되지 않은 종목코드입니다: " + stockCode);
+        }
         if (m_broker) return m_broker->getPrice(stockCode);
         return 0;
     }
@@ -70,4 +82,5 @@ public:
 
 private:
     StockBroker* m_broker = nullptr;
+    std::set<std::string> m_registeredStockCodes;
 };
