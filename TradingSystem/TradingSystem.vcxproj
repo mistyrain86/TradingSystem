@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{12B07A11-EFCE-51D1-1564-D28CD6653F64}</ProjectGuid>
+    <ProjectGuid>{916A76FF-EA09-4721-8D7E-69E88FDB99F0}</ProjectGuid>
     <RootNamespace>TradingSystem</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -138,9 +138,11 @@
     </ClCompile>
     <ClCompile Include="nemo_api.cpp" />
     <ClCompile Include="NemoDriverTest.cpp" />
+    <ClCompile Include="TimingStrategyTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoTradingSystem.h" />
+    <ClInclude Include="Order.h" />
     <ClInclude Include="KiwerDriver.h" />
     <ClInclude Include="MockDriver.h" />
     <ClInclude Include="NemoDriver.h" />

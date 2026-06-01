@@ -5,6 +5,7 @@
 #include "KiwerDriver.h"
 #include "MockDriver.h"
 #include "NemoDriver.h"
+#include "Order.h"
 
 using namespace testing;
 
@@ -123,6 +124,47 @@ TEST_F(AutoTradingSystemTest, SellNiceTimingDoesNotSellOnAscendingPrice) {
         .Times(0);
 
     m_system.sellNiceTiming(STOCKCODE_EXAMPLE, 3);
+}
+
+TEST_F(AutoTradingSystemTest, ScheduledBuyOrder_ExecutesAtTime) {
+    Order order{OrderType::BUY, STOCKCODE_EXAMPLE, 70000, 10};
+    auto executeAt = std::chrono::system_clock::now() +
+                     std::chrono::milliseconds(50);
+
+    EXPECT_CALL(m_mockDriver, buy(STOCKCODE_EXAMPLE, 70000, 10)).Times(1);
+
+    m_system.scheduleOrder(order, executeAt);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+}
+
+TEST_F(AutoTradingSystemTest, ScheduledSellOrder_ExecutesAtTime) {
+    Order order{OrderType::SELL, STOCKCODE_EXAMPLE, 70000, 10};
+    auto executeAt = std::chrono::system_clock::now() +
+                     std::chrono::milliseconds(50);
+
+    EXPECT_CALL(m_mockDriver, sell(STOCKCODE_EXAMPLE, 70000, 10)).Times(1);
+
+    m_system.scheduleOrder(order, executeAt);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+}
+
+TEST_F(AutoTradingSystemTest, ScheduledOrder_LogsExecution) {
+    Order order{OrderType::BUY, STOCKCODE_EXAMPLE, 70000, 10};
+    auto executeAt = std::chrono::system_clock::now() +
+                     std::chrono::milliseconds(50);
+
+    EXPECT_CALL(m_mockDriver, buy(STOCKCODE_EXAMPLE, 70000, 10)).Times(1);
+
+    testing::internal::CaptureStdout();
+    m_system.scheduleOrder(order, executeAt);
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    const std::string log = testing::internal::GetCapturedStdout();
+
+    EXPECT_THAT(log, HasSubstr("[scheduleOrder]"));
+    EXPECT_THAT(log, HasSubstr("BUY"));
+    EXPECT_THAT(log, HasSubstr(STOCKCODE_EXAMPLE));
 }
 
 
