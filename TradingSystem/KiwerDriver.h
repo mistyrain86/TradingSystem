@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "StockBroker.h"
 #include "kiwer_api.cpp"
 
@@ -8,13 +8,11 @@ public:
         m_api.login(id, pass);
     }
 
-    // KiwerAPI 인자 순서: buy(stockCode, count, price)
-    void buy(const std::string& stockCode, int price, int count) override {
+    void buy(const std::string& stockCode, const int price, const int count) override {
         m_api.buy(stockCode, count, price);
     }
 
-    // KiwerAPI 인자 순서: sell(stockCode, count, price)
-    void sell(const std::string& stockCode, int price, int count) override {
+    void sell(const std::string& stockCode, const int price, const int count) override {
         m_api.sell(stockCode, count, price);
     }
 

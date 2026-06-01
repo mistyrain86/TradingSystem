@@ -15,14 +15,37 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="kiwer_api.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="nemo_api.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="AutoTradingSystemTest.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AutoTradingSystem.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="KiwerDriver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="MockDriver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="NemoDriver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="StockBroker.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
