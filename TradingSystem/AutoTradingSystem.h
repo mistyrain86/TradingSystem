@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <chrono>
+#include <iostream>
 #include <set>
 #include <stdexcept>
 #include <thread>
@@ -17,6 +18,10 @@ class AutoTradingSystem {
 public:
     void selectStockBroker(StockBroker* broker) {
         m_broker = broker;
+        const std::string name = broker->getName();
+        if (!name.empty()) {
+            std::cout << "[selectStockBroker] " << name << "\n";
+        }
     }
 
     void registerStockCode(const string& stockCode) {

@@ -4,6 +4,7 @@
 
 class MockDriver : public StockBroker {
 public:
+    MOCK_METHOD(std::string, getName, (), (const, override));
     MOCK_METHOD(void, login, (const std::string& id, const std::string& pass), (override));
     MOCK_METHOD(void, buy, (const std::string& stockCode, const int price, const int count), (override));
     MOCK_METHOD(void, sell, (const std::string& stockCode, const int price, const int count), (override));

@@ -146,6 +146,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <ClCompile Include="AutoTradingSystemTest.cpp" />
+    <ClCompile Include="KiwerDriverTest.cpp" />
+    <ClCompile Include="kiwer_api.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="nemo_api.cpp" />
+    <ClCompile Include="NemoDriverTest.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
