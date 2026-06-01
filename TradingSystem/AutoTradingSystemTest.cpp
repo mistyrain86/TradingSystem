@@ -48,13 +48,13 @@ TEST_F(AutoTradingSystemTest, LoginDelegatesToBroker) {
 }
 
 TEST_F(AutoTradingSystemTest, BuyDelegatesToBroker) {
-    EXPECT_CALL(m_mockDriver, buy(STOCKCODE_EXAMPLE, 70000, 10));
-    m_system.buy(STOCKCODE_EXAMPLE, 70000, 10);
+    EXPECT_CALL(m_mockDriver, buy(STOCKCODE_EXAMPLE, STOCK_PRICE_EXAMPLE, STOCK_COUNT_EXAMPLE));
+    m_system.buy(STOCKCODE_EXAMPLE, STOCK_PRICE_EXAMPLE, STOCK_COUNT_EXAMPLE);
 }
 
 TEST_F(AutoTradingSystemTest, SellDelegatesToBroker) {
-    EXPECT_CALL(m_mockDriver, sell(STOCKCODE_EXAMPLE, 120000, 5));
-    m_system.sell(STOCKCODE_EXAMPLE, 120000, 5);
+    EXPECT_CALL(m_mockDriver, sell(STOCKCODE_EXAMPLE, STOCK_PRICE_EXAMPLE, STOCK_COUNT_EXAMPLE));
+    m_system.sell(STOCKCODE_EXAMPLE, STOCK_PRICE_EXAMPLE, STOCK_COUNT_EXAMPLE);
 }
 
 TEST_F(AutoTradingSystemTest, GetPriceThrowsOnEmptyStockCode) {
@@ -67,8 +67,8 @@ TEST_F(AutoTradingSystemTest, GetPriceThrowsOnUnregisteredStockCode) {
 
 TEST_F(AutoTradingSystemTest, GetPriceReturnsBrokerPrice) {
     EXPECT_CALL(m_mockDriver, getPrice(STOCKCODE_EXAMPLE))
-        .WillOnce(Return(70000));
-    EXPECT_EQ(70000, m_system.getPrice(STOCKCODE_EXAMPLE));
+        .WillOnce(Return(STOCK_PRICE_EXAMPLE));
+    EXPECT_EQ(STOCK_PRICE_EXAMPLE, m_system.getPrice(STOCKCODE_EXAMPLE));
 }
 
 TEST_F(AutoTradingSystemTest, BuyNiceTimingBuysOnAscendingPrice) {
@@ -79,7 +79,7 @@ TEST_F(AutoTradingSystemTest, BuyNiceTimingBuysOnAscendingPrice) {
         .WillOnce(Return(5200));
     EXPECT_CALL(m_mockDriver, buy(STOCKCODE_EXAMPLE, 5200, 1));
 
-    m_system.buyNiceTiming(STOCKCODE_EXAMPLE, 10000);
+    m_system.buyNiceTiming(STOCKCODE_EXAMPLE, TOTAL_AMOUNT);
 }
 
 TEST_F(AutoTradingSystemTest, BuyNiceTimingDoesNotBuyOnDescendingPrice) {
@@ -90,7 +90,7 @@ TEST_F(AutoTradingSystemTest, BuyNiceTimingDoesNotBuyOnDescendingPrice) {
     EXPECT_CALL(m_mockDriver, buy(_, _, _))
         .Times(0);
 
-    m_system.buyNiceTiming(STOCKCODE_EXAMPLE, 10000);
+    m_system.buyNiceTiming(STOCKCODE_EXAMPLE, TOTAL_AMOUNT);
 }
 
 TEST_F(AutoTradingSystemTest, BuyNiceTimingDoesNotBuyOnFlatPrice) {
@@ -101,7 +101,7 @@ TEST_F(AutoTradingSystemTest, BuyNiceTimingDoesNotBuyOnFlatPrice) {
     EXPECT_CALL(m_mockDriver, buy(_, _, _))
         .Times(0);
 
-    m_system.buyNiceTiming(STOCKCODE_EXAMPLE, 10000);
+    m_system.buyNiceTiming(STOCKCODE_EXAMPLE, TOTAL_AMOUNT);
 }
 
 TEST_F(AutoTradingSystemTest, SellNiceTimingSellsOnDescendingPrice) {
@@ -127,11 +127,12 @@ TEST_F(AutoTradingSystemTest, SellNiceTimingDoesNotSellOnAscendingPrice) {
 }
 
 TEST_F(AutoTradingSystemTest, ScheduledBuyOrder_ExecutesAtTime) {
-    Order order{OrderType::BUY, STOCKCODE_EXAMPLE, 70000, 10};
+    Order order{OrderType::BUY, STOCKCODE_EXAMPLE, STOCK_PRICE_EXAMPLE, STOCK_COUNT_EXAMPLE };
     auto executeAt = std::chrono::system_clock::now() +
                      std::chrono::milliseconds(50);
 
-    EXPECT_CALL(m_mockDriver, buy(STOCKCODE_EXAMPLE, 70000, 10)).Times(1);
+    EXPECT_CALL(m_mockDriver, buy(STOCKCODE_EXAMPLE, STOCK_PRICE_EXAMPLE, STOCK_COUNT_EXAMPLE))
+        .Times(1);
 
     m_system.scheduleOrder(order, executeAt);
 
@@ -139,11 +140,12 @@ TEST_F(AutoTradingSystemTest, ScheduledBuyOrder_ExecutesAtTime) {
 }
 
 TEST_F(AutoTradingSystemTest, ScheduledSellOrder_ExecutesAtTime) {
-    Order order{OrderType::SELL, STOCKCODE_EXAMPLE, 70000, 10};
+    Order order{OrderType::SELL, STOCKCODE_EXAMPLE, STOCK_PRICE_EXAMPLE, STOCK_COUNT_EXAMPLE };
     auto executeAt = std::chrono::system_clock::now() +
                      std::chrono::milliseconds(50);
 
-    EXPECT_CALL(m_mockDriver, sell(STOCKCODE_EXAMPLE, 70000, 10)).Times(1);
+    EXPECT_CALL(m_mockDriver, sell(STOCKCODE_EXAMPLE, STOCK_PRICE_EXAMPLE, STOCK_COUNT_EXAMPLE))
+        .Times(1);
 
     m_system.scheduleOrder(order, executeAt);
 
@@ -151,11 +153,12 @@ TEST_F(AutoTradingSystemTest, ScheduledSellOrder_ExecutesAtTime) {
 }
 
 TEST_F(AutoTradingSystemTest, ScheduledOrder_LogsExecution) {
-    Order order{OrderType::BUY, STOCKCODE_EXAMPLE, 70000, 10};
+    Order order{OrderType::BUY, STOCKCODE_EXAMPLE, STOCK_PRICE_EXAMPLE, STOCK_COUNT_EXAMPLE };
     auto executeAt = std::chrono::system_clock::now() +
                      std::chrono::milliseconds(50);
 
-    EXPECT_CALL(m_mockDriver, buy(STOCKCODE_EXAMPLE, 70000, 10)).Times(1);
+    EXPECT_CALL(m_mockDriver, buy(STOCKCODE_EXAMPLE, STOCK_PRICE_EXAMPLE, STOCK_COUNT_EXAMPLE))
+        .Times(1);
 
     testing::internal::CaptureStdout();
     m_system.scheduleOrder(order, executeAt);

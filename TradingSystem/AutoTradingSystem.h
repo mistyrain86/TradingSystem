@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <chrono>
 #include <condition_variable>
 #include <iomanip>
@@ -15,12 +15,7 @@
 #include "StockBroker.h"
 
 using std::string;
-
-namespace {
-    const string STOCKCODE_EXAMPLE = "005930";
-    const string EMPTY_STOCKCODE = "";
-    const string UNREGISTER_STOCKCODE = "99999999";
-}
+using std::vector;
 
 class AutoTradingSystem {
 public:
@@ -89,23 +84,17 @@ public:
         checkInvalidStockCode(stockCode);
         if (!m_broker) return;
 
-        std::vector<int> prices;
-        prices.reserve(3);
-        for (int i = 0; i < 3; ++i) {
-            prices.push_back(m_broker->getPrice(stockCode));
-            if (i < 2) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(200));
-            }
-        }
+        vector<int> prices = collectPriceTrend(stockCode);
 
         const bool doBuy = m_strategy
             ? m_strategy->shouldBuy(prices)
-            : (prices[0] < prices[1] && prices[1] < prices[2]);
+            : (isUptrend(prices));
 
         if (doBuy) {
-            const int count = totalAmount / prices[2];
-            if (count > 0) {
-                m_broker->buy(stockCode, prices[2], count);
+            int currentPrice = prices.back();
+            int shareCount = calculateMaxShares(totalAmount, currentPrice);
+            if (shareCount > 0) {
+                m_broker->buy(stockCode, currentPrice, shareCount);
             }
         }
     }
@@ -115,21 +104,14 @@ public:
         checkInvalidStockCode(stockCode);
         if (!m_broker) return;
 
-        std::vector<int> prices;
-        prices.reserve(3);
-        for (int i = 0; i < 3; ++i) {
-            prices.push_back(m_broker->getPrice(stockCode));
-            if (i < 2) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(200));
-            }
-        }
+        vector<int> prices = collectPriceTrend(stockCode);
 
         const bool doSell = m_strategy
             ? m_strategy->shouldSell(prices)
-            : (prices[0] > prices[1] && prices[1] > prices[2]);
+            : (isDowntrend(prices));
 
         if (doSell) {
-            m_broker->sell(stockCode, prices[2], count);
+            m_broker->sell(stockCode, prices.back(), count);
         }
     }
 
@@ -206,8 +188,46 @@ private:
         }
     }
 
-    ITimingStrategy* m_strategy = nullptr;
+    vector<int> collectPriceTrend(const string& stockCode) {
+        vector<int> prices(TREND_CHECK_COUNT);
+        for (int i = 0; i < TREND_CHECK_COUNT; ++i) {
+            prices[i] = m_broker->getPrice(stockCode);
+            if (i < TREND_CHECK_COUNT - 1) {
+                std::this_thread::sleep_for(PRICE_CHECK_INTERVAL);
+            }
+        }
+        return prices;
+    }
+
+    bool isUptrend(const vector<int>& prices) const {
+        if (prices.size() < 2) return false;
+
+        for (size_t i = 0; i < prices.size() - 1; ++i) {
+            if (prices[i] >= prices[i + 1]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool isDowntrend(const vector<int>& prices) const {
+        if (prices.size() < 2) return false;
+
+        for (size_t i = 0; i < prices.size() - 1; ++i) {
+            if (prices[i] <= prices[i + 1]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    int calculateMaxShares(int totalAmount, int currentPrice) const {
+        if (currentPrice <= 0) return 0;
+        return totalAmount / currentPrice;
+    }
+
     StockBroker* m_broker = nullptr;
+    ITimingStrategy* m_strategy = nullptr;
     std::set<string> m_registeredStockCodes;
 
     std::priority_queue<ScheduledOrder,
@@ -217,4 +237,7 @@ private:
     std::condition_variable m_cv;
     bool m_running = false;
     std::thread m_workerThread;
+
+    static constexpr int TREND_CHECK_COUNT = 3;
+    static constexpr auto PRICE_CHECK_INTERVAL = std::chrono::milliseconds(200);
 };

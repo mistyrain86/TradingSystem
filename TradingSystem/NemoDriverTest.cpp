@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+﻿#include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "NemoDriver.h"
 
@@ -22,15 +22,17 @@ TEST_F(NemoDriverTest, Login_PrintsNemoLoginGood) {
 }
 
 TEST_F(NemoDriverTest, Buy_PrintsNemoBuyMessage) {
-    auto output = captureOutput([&] { m_driver.buy("005930", 70000, 10); });
-    EXPECT_THAT(output, HasSubstr("[NEMO]005930 buy stock ( price : 70000 ) * ( count : 10)"));
+    auto output = captureOutput([&] { m_driver.buy(STOCKCODE_EXAMPLE, STOCK_PRICE_EXAMPLE, STOCK_COUNT_EXAMPLE); });
+    string logMessage = "[NEMO]" + STOCKCODE_EXAMPLE + " buy stock ( price : " + std::to_string(STOCK_PRICE_EXAMPLE) + " ) * ( count : " + std::to_string(STOCK_COUNT_EXAMPLE) + ")";
+    EXPECT_THAT(output, HasSubstr(logMessage));
 }
 
 TEST_F(NemoDriverTest, Sell_PrintsNemoSellMessage) {
-    auto output = captureOutput([&] { m_driver.sell("000270", 120000, 5); });
-    EXPECT_THAT(output, HasSubstr("[NEMO]000270 sell stock ( price : 120000 ) * ( count : 5)"));
+    auto output = captureOutput([&] { m_driver.sell(STOCKCODE_EXAMPLE, STOCK_PRICE_EXAMPLE, STOCK_COUNT_EXAMPLE); });
+    string logMessage = "[NEMO]" + STOCKCODE_EXAMPLE + " sell stock ( price : " + std::to_string(STOCK_PRICE_EXAMPLE) + " ) * ( count : " + std::to_string(STOCK_COUNT_EXAMPLE) + ")";
+    EXPECT_THAT(output, HasSubstr(logMessage));
 }
 
 TEST_F(NemoDriverTest, GetPrice_ReturnsValueInValidRange) {
-    EXPECT_THAT(m_driver.getPrice("005930"), AllOf(Ge(5000), Le(5900)));
+    EXPECT_THAT(m_driver.getPrice(STOCKCODE_EXAMPLE), AllOf(Ge(5000), Le(5900)));
 }

@@ -14,7 +14,8 @@ int main(int argc, char* argv[]) {
     std::cout << "\n--- [Test 환경] Mock Driver 테스트 ---\n";
     AutoTradingSystem system;
     testing::NiceMock<MockDriver> mockBroker;
-    ON_CALL(mockBroker, getPrice(testing::_)).WillByDefault(testing::Return(5500));
+    ON_CALL(mockBroker, getPrice(testing::_))
+        .WillByDefault(testing::Return(5500));
     system.selectStockBroker(&mockBroker);
     system.registerStockCode(STOCKCODE_EXAMPLE);
     system.login("test_user", "password123");
@@ -24,14 +25,14 @@ int main(int argc, char* argv[]) {
     KiwerDriver kiwerBroker;
     system.selectStockBroker(&kiwerBroker);
     system.login("kiwer_id", "kiwer_pass");
-    system.buy(STOCKCODE_EXAMPLE, 70000, 10);
+    system.buy(STOCKCODE_EXAMPLE, STOCK_PRICE_EXAMPLE, STOCK_COUNT_EXAMPLE);
     std::cout << "\n";
 
     std::cout << "--- [실환경] 네모증권 연동 ---\n";
     NemoDriver nemoBroker;
     system.selectStockBroker(&nemoBroker);
     system.login("nemo_id", "nemo_pass");
-    system.sell(STOCKCODE_EXAMPLE, 120000, 5);
+    system.sell(STOCKCODE_EXAMPLE, STOCK_PRICE_EXAMPLE, STOCK_COUNT_EXAMPLE);
 
     return 0;
 }
