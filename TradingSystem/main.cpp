@@ -16,6 +16,7 @@ int main(int argc, char* argv[]) {
     testing::NiceMock<MockDriver> mockBroker;
     ON_CALL(mockBroker, getPrice(testing::_)).WillByDefault(testing::Return(5500));
     system.selectStockBroker(&mockBroker);
+    system.registerStockCode("005930");
     system.login("test_user", "password123");
     std::cout << "현재가 파악: " << system.getPrice("005930") << "\n\n";
 

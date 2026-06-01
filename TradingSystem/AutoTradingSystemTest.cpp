@@ -1,4 +1,4 @@
-#include <gtest/gtest.h>
+﻿#include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "AutoTradingSystem.h"
 #include "MockDriver.h"
@@ -30,7 +30,16 @@ TEST_F(AutoTradingSystemTest, SellDelegatesToBroker) {
     m_system.sell("000270", 120000, 5);
 }
 
+TEST_F(AutoTradingSystemTest, GetPriceThrowsOnEmptyStockCode) {
+    EXPECT_THROW(m_system.getPrice(""), std::invalid_argument);
+}
+
+TEST_F(AutoTradingSystemTest, GetPriceThrowsOnUnregisteredStockCode) {
+    EXPECT_THROW(m_system.getPrice("999999"), std::invalid_argument);
+}
+
 TEST_F(AutoTradingSystemTest, GetPriceReturnsBrokerPrice) {
+    m_system.registerStockCode("005930");
     EXPECT_CALL(m_mockDriver, getPrice("005930")).WillOnce(Return(70000));
     EXPECT_EQ(70000, m_system.getPrice("005930"));
 }
