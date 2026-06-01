@@ -141,6 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoTradingSystem.h" />
+    <ClInclude Include="Order.h" />
     <ClInclude Include="KiwerDriver.h" />
     <ClInclude Include="MockDriver.h" />
     <ClInclude Include="NemoDriver.h" />
