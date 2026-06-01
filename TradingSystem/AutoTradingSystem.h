@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <thread>
 #include <vector>
+#include "ITimingStrategy.h"
 #include "Order.h"
 #include "StockBroker.h"
 
@@ -55,6 +56,10 @@ public:
         m_cv.notify_one();
     }
 
+    void setTimingStrategy(ITimingStrategy* strategy) {
+        m_strategy = strategy;
+    }
+
     void registerStockCode(const string& stockCode) {
         m_registeredStockCodes.insert(stockCode);
     }
@@ -79,20 +84,25 @@ public:
         return 0;
     }
 
-    // 200ms 주기로 3회 조회 후 상승 추세이면 totalAmount 한도 내 최대 수량 매수
+    // 200ms 주기로 3회 조회 후 전략(미설정 시 상승 추세)에 따라 매수
     void buyNiceTiming(const string& stockCode, int totalAmount) {
         checkInvalidStockCode(stockCode);
         if (!m_broker) return;
 
-        int prices[3];
+        std::vector<int> prices;
+        prices.reserve(3);
         for (int i = 0; i < 3; ++i) {
-            prices[i] = m_broker->getPrice(stockCode);
+            prices.push_back(m_broker->getPrice(stockCode));
             if (i < 2) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
             }
         }
 
-        if (prices[0] < prices[1] && prices[1] < prices[2]) {
+        const bool doBuy = m_strategy
+            ? m_strategy->shouldBuy(prices)
+            : (prices[0] < prices[1] && prices[1] < prices[2]);
+
+        if (doBuy) {
             const int count = totalAmount / prices[2];
             if (count > 0) {
                 m_broker->buy(stockCode, prices[2], count);
@@ -100,20 +110,25 @@ public:
         }
     }
 
-    // 200ms 주기로 3회 조회 후 하락 추세이면 count 수량 전량 매도
+    // 200ms 주기로 3회 조회 후 전략(미설정 시 하락 추세)에 따라 매도
     void sellNiceTiming(const string& stockCode, int count) {
         checkInvalidStockCode(stockCode);
         if (!m_broker) return;
 
-        int prices[3];
+        std::vector<int> prices;
+        prices.reserve(3);
         for (int i = 0; i < 3; ++i) {
-            prices[i] = m_broker->getPrice(stockCode);
+            prices.push_back(m_broker->getPrice(stockCode));
             if (i < 2) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
             }
         }
 
-        if (prices[0] > prices[1] && prices[1] > prices[2]) {
+        const bool doSell = m_strategy
+            ? m_strategy->shouldSell(prices)
+            : (prices[0] > prices[1] && prices[1] > prices[2]);
+
+        if (doSell) {
             m_broker->sell(stockCode, prices[2], count);
         }
     }
@@ -191,6 +206,7 @@ private:
         }
     }
 
+    ITimingStrategy* m_strategy = nullptr;
     StockBroker* m_broker = nullptr;
     std::set<string> m_registeredStockCodes;
 
