@@ -4,6 +4,10 @@
 
 class KiwerDriver : public StockBroker {
 public:
+    std::string getName() const override {
+        return "KiwerDriver";
+    }
+
     void login(const std::string& id, const std::string& pass) override {
         m_api.login(id, pass);
     }

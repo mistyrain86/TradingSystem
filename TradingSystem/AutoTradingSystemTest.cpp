@@ -1,19 +1,44 @@
 ﻿#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <sstream>
 #include "AutoTradingSystem.h"
+#include "KiwerDriver.h"
 #include "MockDriver.h"
+#include "NemoDriver.h"
 
 using namespace testing;
 
 class AutoTradingSystemTest : public Test {
 protected:
     AutoTradingSystem m_system;
-    MockDriver m_mockDriver;
+    NiceMock<MockDriver> m_mockDriver;
 
     void SetUp() override {
+        ON_CALL(m_mockDriver, getName()).WillByDefault(Return(""));
         m_system.selectStockBroker(&m_mockDriver);
     }
+
+    std::string captureSelectBrokerLog(StockBroker* broker) {
+        std::ostringstream oss;
+        auto oldCoutStreamBuf = std::cout.rdbuf();
+        std::cout.rdbuf(oss.rdbuf());
+        m_system.selectStockBroker(broker);
+        std::cout.rdbuf(oldCoutStreamBuf);
+        return oss.str();
+    }
 };
+
+TEST_F(AutoTradingSystemTest, SelectsKiwerBrocker) {
+    KiwerDriver kiwerBroker;
+    std::string expect = "[selectStockBroker] " + kiwerBroker.getName() + "\n";
+    EXPECT_THAT(captureSelectBrokerLog(&kiwerBroker), Eq(expect));
+}
+
+TEST_F(AutoTradingSystemTest, SelectsNemoBrocker) {
+    NemoDriver nemoBroker;
+    std::string expect = "[selectStockBroker] " + nemoBroker.getName() + "\n";
+    EXPECT_THAT(captureSelectBrokerLog(&nemoBroker), Eq(expect));
+}
 
 TEST_F(AutoTradingSystemTest, LoginDelegatesToBroker) {
     EXPECT_CALL(m_mockDriver, login("test_user", "test_pass"));
@@ -95,3 +120,5 @@ TEST_F(AutoTradingSystemTest, SellNiceTimingDoesNotSellOnAscendingPrice) {
 
     m_system.sellNiceTiming("005930", 3);
 }
+
+
