@@ -20,11 +20,11 @@ public:
         m_api.sellingStock(stockCode, price, count);
     }
 
-    // minute=1: NemoAPI 최소 지연(1ms) 적용
     int getPrice(const std::string& stockCode) override {
-        return m_api.getMarketPrice(stockCode, 1);
+        return m_api.getMarketPrice(stockCode, delayMinute);
     }
 
 private:
     NemoAPI m_api;
+    const int delayMinute = 1;
 };
