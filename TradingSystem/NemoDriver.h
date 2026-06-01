@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "StockBroker.h"
 #include "nemo_api.cpp"
 
@@ -12,11 +12,11 @@ public:
         m_api.certification(id, pass);
     }
 
-    void buy(const std::string& stockCode, int price, int count) override {
+    void buy(const std::string& stockCode, const int price, const int count) override {
         m_api.purchasingStock(stockCode, price, count);
     }
 
-    void sell(const std::string& stockCode, int price, int count) override {
+    void sell(const std::string& stockCode, const int price, const int count) override {
         m_api.sellingStock(stockCode, price, count);
     }
 
